@@ -1,0 +1,12 @@
+table select{
+	width:173px; 		
+	height: 21px;
+}
+
+a{
+	color: black;
+	text-decoration: none;
+}
+a:HOVER {
+	text-decoration: underline;
+}

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	
+	<!-- 配置c3p0 -->
+	<bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${lwc.driver}"></property>
+		<property name="jdbcUrl" value="${lwc.url}"></property>
+		<property name="user" value="${lwc.username}"></property>
+		<property name="password" value="${lwc.password}"></property>
+	</bean>
+
+	<!-- 把hibernate整个的配置信息都封装到这里了 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<!-- 配置数据库信息 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 配置hibernate信息 -->
+		<!-- <property name="configLocations" value="classpath:hibernate.cfg.xml"></property> -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext
+				</prop>
+			</props>
+		</property>
+
+		<!-- 扫描实体类 -->
+		<property name="packagesToScan">
+			<list>
+				<value>cn.lwc.entity</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- 这里是spring对hibernate的封装类,用来对数据库操作 -->
+	<bean id="hibernate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+
+
+
+
+
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<!-- 开启事务注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- 开启spring注解 -->
+	<context:component-scan base-package="cn.lwc"></context:component-scan>
+
+
+
+
+
+	<!-- 导入service层文件 -->
+
+	<!-- <import resource="classpath:user.xml" /> -->
+
+
+
+
+
+
+</beans>
